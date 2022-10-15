@@ -1,6 +1,12 @@
 const fs = require('fs');
+require('dotenv').config();
+
 const sqlite3 = require('sqlite3').verbose();
-const filepath = './export-main.db';
+
+//file name to save into sqlite file format.
+const filepath = './main.db';
+//sqlite table name to save.
+const dbTableName = process.env.TABLE_NAME;
 
 function connectToDatabase() {
     if (fs.existsSync(filepath)) {
@@ -19,7 +25,7 @@ function connectToDatabase() {
 
 function createTable(db) {
     db.exec(`
-    CREATE TABLE sandbox
+    CREATE TABLE ${dbTableName}
     (
         TxnHash     TEXT,
         Ts          TEXT,

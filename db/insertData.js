@@ -1,9 +1,11 @@
 const db = require('./db');
+require('dotenv').config();
+const dbTableName = process.env.TABLE_NAME;
 
 const insertRow = async (row) => {
     db.serialize(function() {
         db.run(
-            `INSERT INTO sandbox VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO ${dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]],
             function(error) {
                 if (error) {

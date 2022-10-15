@@ -6,6 +6,8 @@ require('dotenv').config();
 const marketplaceData = require('../config/MarketplaceData.json');
 
 const apiKey = process.env.ALCHEMY_KEY;
+const cryptoCompareKey = process.env.CRYPTOCOMPARE_KEY;
+const eps = 1e-8;
 const Action = {
     buy: 'Bought',
     bid: 'Bid Won'
@@ -19,6 +21,10 @@ const settings = {
 const alchemy = new Alchemy(settings);
 const SDK_URL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
 const web3 = new Web3(SDK_URL);
+
+const isValidTimeFormat = (dateString) => {
+    return new Date(dateString).toString() !== "Invalid Date";
+}
 
 const timestamp2UTC = (timestamp) => {
     const date = new Date(timestamp * 1000);
@@ -46,6 +52,20 @@ const getNFTMetadata = async (tokenAddress, tokenId) => {
     const metadata = await alchemy.nft.getNftMetadata(tokenAddress, tokenId);
     return metadata;
 }
+
+const getCurrencyPrice = async (timestamp, token, currency) => {
+    const URL = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${token}&tsyms=${currency}&ts=${timestamp}&api_key=${cryptoCompareKey}`
+    
+    let tokenPrice = 0.0;
+    
+    await fetch(URL)
+    .then(response => response.json())
+    .then(json => tokenPrice = json[token][currency])
+    .catch(err => console.error(err));
+
+    return tokenPrice > eps ? tokenPrice: 0.0;
+}
+
 
 const determineMarketPlace = (logs) => {
     let result;
@@ -148,8 +168,10 @@ module.exports = {
     getNFTMetadata,
     determineMarketPlace,
     parseDecodedData,
+    isValidTimeFormat,
     timestamp2UTC,
     UTC2timestamp,
     hexToNumberString,
+    getCurrencyPrice,
     alchemy
 }

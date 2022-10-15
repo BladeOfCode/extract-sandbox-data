@@ -1,14 +1,29 @@
 
-const {getNFTMetadata, UTC2timestamp, alchemy, hexToNumberString} = require('./utils');
+const {getNFTMetadata, UTC2timestamp, alchemy, hexToNumberString, getCurrencyPrice} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
 const { insertRow , insertRows} = require('../db/insertData');
 
 const axios = require('axios');
+const { Queue } = require('./Queue');
+const buffer = new Queue();
 require('dotenv').config();
 
-const apiKey = process.env.ALCHEMY_KEY
+const apiKey = process.env.ALCHEMY_KEY;
 const baseURL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
 
+const parseAndWriteDB = async (currency) => {
+    const timestamp = (buffer.peek()).Ts;
+    const tokenPrice = await getCurrencyPrice(timestamp, currency, "USD");
+    
+    const bufferLen = buffer.length;
+    while(!buffer.isEmpty) {
+        const data = buffer.dequeue();
+        const priceToken = data.Price / bufferLen;
+        const priceDollar = priceToken * tokenPrice;
+        data.Price = `${priceToken} ${currency} ($${priceDollar})`;
+        await insertRow(Object.values(data));
+    }
+}
 /**
  * 
  * @param {20 bytes hex string} tokenAddress 
@@ -16,8 +31,6 @@ const baseURL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
  * @param {*} fromBlock 
  * @param {*} toBlock 
  */
-
-
 const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) => {
     /** axios config settings */
     // data 
@@ -54,7 +67,9 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * current block gets bigger than 'toBlock'
      */
     let currentLastBlock = fromBlock;
+    let pastTxnHash;
     let resultCnt = 0;
+    let firstRun = true;
     do {
         const res = await alchemy.core.getAssetTransfers({
             "fromBlock":`${currentLastBlock}`, //String: starting block
@@ -85,20 +100,28 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             const result = {
                 TxnHash: transfer.hash,
                 Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
-                Dt: transfer.metadata.blockTimestamp.toString().slice(-4),
+                Dt: transfer.metadata.blockTimestamp.toString().slice(19),
                 Action: marketInfo.action,
                 Buyer: transfer.to,
                 NFT: metadata.contract.name,
                 TokenId: hexToNumberString(transfer.tokenId),
                 TType: metadata.contract.tokenType,
                 Quantity: marketInfo.quantity,
-                Price: marketInfo.price + " " + marketInfo.currency,
+                Price: marketInfo.price,
                 Market: marketInfo.marketplace
             }
-            console.log(result);
-            await insertRow(Object.values(result));
+            // console.log(result);
+            if (pastTxnHash === result.TxnHash || firstRun) {
+                buffer.enqueue(result);
+                if (firstRun) firstRun = false;
+            } else {
+                await parseAndWriteDB(marketInfo.currency);
+                buffer.enqueue(result);
+            }
+            pastTxnHash = result.TxnHash;
+            // await insertRow(Object.values(result));
             resultCnt++;
-        }        
+        }
     } while(currentLastBlock < toBlock);
     console.log(resultCnt);
 }
