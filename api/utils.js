@@ -39,7 +39,6 @@ const hexToNumberString = (hex) => {
 
 const getTokenMetadata = async (tokenAddress) => {
     const metadata = await alchemy.core.getTokenMetadata(tokenAddress);
-    console.log("----------------", metadata);
     return metadata;
 }
 
@@ -49,11 +48,12 @@ const getNFTMetadata = async (tokenAddress, tokenId) => {
 }
 
 const determineMarketPlace = (logs) => {
-    let result = marketplaceData[0];
+    let result;
     
     if (!logs.length) return result;
     const logSignature = logs[logs.length - 1].topics[0];
     
+    // console.log(logSignature);
     for (const marketplace of marketplaceData) {
         if (marketplace.signature === logSignature) {
             result = marketplace;
@@ -61,6 +61,10 @@ const determineMarketPlace = (logs) => {
         }
     }
 
+    if (!result) {
+        
+        // console.log(logSignature);
+    }
     return result;
 }
 
@@ -146,5 +150,6 @@ module.exports = {
     parseDecodedData,
     timestamp2UTC,
     UTC2timestamp,
+    hexToNumberString,
     alchemy
 }

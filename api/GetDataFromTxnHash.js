@@ -17,11 +17,14 @@ const web3 = new Web3(SDK_URL);
 const getDataFromTxnHash = async (txnHash, timestamp) => {
     let result;
 
-    await web3.eth.getTransactionReceipt(txnHash, async (error, receipt) => {
+    await web3.eth.getTransactionReceipt(txnHash, (error, receipt) => {
         if (error) {
             console.log("Error:", error);
         } else {
             const marketPlace = determineMarketPlace(receipt.logs);
+            if (!marketPlace) {
+                return;
+            }
             if (marketPlace.marketplace === "Opensea") {
                 if (timestamp >= marketPlace.timestamp) abiDecoder.addABI(marketPlace.abi[1]);
                 else abiDecoder.addABI(marketPlace.abi[0]);
@@ -29,12 +32,14 @@ const getDataFromTxnHash = async (txnHash, timestamp) => {
                 abiDecoder.addABI(marketPlace.abi[0]);
             }
             const decodedLog = abiDecoder.decodeLogs(receipt.logs);
-            result = await parseDecodedData(marketPlace, decodedLog);
-            console.log(result);
+            parseDecodedData(marketPlace, decodedLog)
+            .then(function(resolve) {
+                result = resolve;
+            });
         }
     })
 
-    if (result) return result;
+    return result;
 }
 
 
@@ -44,7 +49,7 @@ const getDataFromTxnHash = async (txnHash, timestamp) => {
 //Rarible, 0x1a2d398f10a358c2c0929271f708c02f7cbff815de5eca6eb7115ca6ca19613a, 0xb0db05c87be86a292498d15815e227d5a9a92a32d9f8466f80bb2ce73642d104
 //X2Y2,0x15e3a860bce5e8741511e0076d8e9118524b5bd4c51d49b132a3fb0648d0cb43
 
-// const txnHash = "0xcae42d3ce5c046e4f1ef985ffcee20507ed3a50fecb833d13d2e45cddccdb924";
+// const txnHash = "0x85e3e3ebcd0575ffa2359e2a2618853e0cd03039f3c57c33707307d23478205d";
 // const timeStamp = UTC2timestamp("2022-03-19T11:11:49.000Z");
 
 // ( async() => {
