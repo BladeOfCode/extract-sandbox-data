@@ -23,6 +23,12 @@ const columns = [
     "Market"
 ];
 
+/**
+ * 
+ * @param {string} stDate : general time format 2000:01:01 00:00:00
+ * @param {string} edDate : general time format 2000:01:01 00:00:00
+ * @param {string} filename : file name to save,
+ */
 const writeCSV =  async (stDate, edDate, filename) => {
     if (!filename) filename = `sandbox ${stDate},${edDate}.csv`;
 
@@ -43,12 +49,10 @@ const writeCSV =  async (stDate, edDate, filename) => {
         }
         stringifier.write(row);
     });
-    db.close();
     console.log("Finished writing data");    
     stringifier.pipe(writableStream);
 }
 
-// writeCSV("2019-12-05 23:32:50", "2020-01-01 00:00:00", "");
 
 module.exports = {
     writeCSV

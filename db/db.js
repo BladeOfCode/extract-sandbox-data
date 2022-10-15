@@ -8,6 +8,11 @@ const filepath = './main.db';
 //sqlite table name to save.
 const dbTableName = process.env.TABLE_NAME;
 
+/**
+ * 
+ * @returns connect to the database
+ * if there is no db file, it will automatically create new db file.
+ */
 function connectToDatabase() {
     if (fs.existsSync(filepath)) {
         return new sqlite3.Database(filepath);
@@ -23,6 +28,10 @@ function connectToDatabase() {
     }
 }
 
+/**
+ * @param {instance of sqlite3} db 
+ * create new table 
+ */
 function createTable(db) {
     db.exec(`
     CREATE TABLE ${dbTableName}
