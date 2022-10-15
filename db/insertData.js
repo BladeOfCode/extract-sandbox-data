@@ -2,6 +2,11 @@ const db = require('./db');
 require('dotenv').config();
 const dbTableName = process.env.TABLE_NAME;
 
+/**
+ * 
+ * @param {array of string} row
+ * insert data into database 
+ */
 const insertRow = async (row) => {
     db.serialize(function() {
         db.run(
@@ -17,6 +22,11 @@ const insertRow = async (row) => {
     }) 
 }
 
+/**
+ * 
+ * @param {array of array} rows
+ * insert data into database 
+ */
 const insertRows = async (rows) => {
     for (const row of rows) {
         await insertRow(row);

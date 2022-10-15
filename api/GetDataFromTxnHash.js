@@ -14,13 +14,21 @@ const alchemy = new Alchemy(settings);
 const SDK_URL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
 const web3 = new Web3(SDK_URL);
 
+/**
+ * 
+ * @param {hex string} txnHash 
+ * @param {uint} timestamp 
+ * @returns {marketplace, action, buyer, price, quantity} information from transaction hash.
+ */
 const getDataFromTxnHash = async (txnHash, timestamp) => {
     let result;
 
+    // fetch transactions from txnHash
     await web3.eth.getTransactionReceipt(txnHash, (error, receipt) => {
         if (error) {
             console.log("Error:", error);
         } else {
+            // determine marketplaces(Opensea, Looksrare, Rarible, X2Y2) based on logs/events
             const marketPlace = determineMarketPlace(receipt.logs);
             if (!marketPlace) {
                 return;
@@ -31,7 +39,11 @@ const getDataFromTxnHash = async (txnHash, timestamp) => {
             } else {
                 abiDecoder.addABI(marketPlace.abi[0]);
             }
+
+            //decode logs to human readable data
             const decodedLog = abiDecoder.decodeLogs(receipt.logs);
+
+            //parse decoded logs to available info (marketplace, action, buyer, price, quantity)
             parseDecodedData(marketPlace, decodedLog)
             .then(function(resolve) {
                 result = resolve;
