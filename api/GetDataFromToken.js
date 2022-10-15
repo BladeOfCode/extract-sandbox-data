@@ -1,6 +1,7 @@
 
 const {getNFTMetadata, UTC2timestamp, alchemy, hexToNumberString} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
+const { insertRow , insertRows} = require('../db/insertData');
 
 const axios = require('axios');
 require('dotenv').config();
@@ -53,11 +54,10 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * current block gets bigger than 'toBlock'
      */
     let currentLastBlock = fromBlock;
-
+    let resultCnt = 0;
     do {
-        
         const res = await alchemy.core.getAssetTransfers({
-            "fromBlock":`${fromBlock}`, //String: starting block
+            "fromBlock":`${currentLastBlock}`, //String: starting block
             "toBlock": `${toBlock}`, //String: end block
             "order": "asc", //String: Whether to return results i ascending (asc) or descending (desc) order
             "contractAddresses": [`${tokenAddress}`],  // Array of Strings: List of contract addresses (hex strings) to filter for
@@ -74,7 +74,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
 
             const marketInfo = await getDataFromTxnHash(transfer.hash, UTC2timestamp(transfer.metadata.blockTimestamp));   
             if (!marketInfo) {
-                console.log(i);
+                // console.log(i);
                 continue;
             }
             //get NFTMetadata from tokenAddresss and its id.
@@ -85,26 +85,28 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             const result = {
                 TxnHash: transfer.hash,
                 Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
-                Dt: transfer.metadata.blockTimestamp,
+                Dt: transfer.metadata.blockTimestamp.toString().slice(-4),
                 Action: marketInfo.action,
-                Buyer: transfer.from,
+                Buyer: transfer.to,
                 NFT: metadata.contract.name,
                 TokenId: hexToNumberString(transfer.tokenId),
                 TType: metadata.contract.tokenType,
                 Quantity: marketInfo.quantity,
-                Price: marketInfo.price,
+                Price: marketInfo.price + " " + marketInfo.currency,
                 Market: marketInfo.marketplace
             }
-            
+            console.log(result);
+            await insertRow(Object.values(result));
+            resultCnt++;
         }        
     } while(currentLastBlock < toBlock);
-
+    console.log(resultCnt);
 }
 
 const tokenAddr = "0x50f5474724e0ee42d9a4e711ccfb275809fd6d4a";
 const tokenTypes = ["erc721"];
 const fromBlock =  "0x8A2C86";
-const toBlock = "latest";
+const toBlock = "0x8C54A2";
 
 getDataFromToken(tokenAddr, tokenTypes, fromBlock, toBlock);
 
