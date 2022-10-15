@@ -1,5 +1,5 @@
 
-const {getNFTMetadata, UTC2timestamp, alchemy} = require('./utils');
+const {getNFTMetadata, UTC2timestamp, alchemy, hexToNumberString} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
 
 const axios = require('axios');
@@ -53,43 +53,9 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * current block gets bigger than 'toBlock'
      */
     let currentLastBlock = fromBlock;
-    // do {
-        
-        // await axios(config)
-        // .then(async function (response) {
-        //     const tmp = await Promise.all(
-        //         response.data.result.transfers.map(async (transfer) => {
-        //             //get {Marketplace, Action, quantity, price} from 
-    
-        //             const marketInfo = await getDataFromTxnHash(transfer.hash, UTC2timestamp(transfer.metadata.blockTimestamp));   
-        //             //get NFTMetadata from tokenAddresss and its id.
-        //             const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
-        //             currentLastBlock = transfer.blockNum;
-                    
-        //             const result = {
-        //                 TxnHash: transfer.hash,
-        //                 Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
-        //                 Dt: transfer.metadata.blockTimestamp,
-        //                 Action: marketInfo.action,
-        //                 Buyer: transfer.from,
-        //                 NFT: metadata.contract.name,
-        //                 TokenId: transfer.tokenId,
-        //                 TType: metadata.contract.tokenType,
-        //                 Quantity: marketInfo.quantity,
-        //                 Price: marketInfo.price,
-        //                 Market: marketInfo.marketplace
-        //             }
-                    
-        //             return result;
-        //         })
-        //     )
 
-        // })
-        // .catch(function (error) {
-        //     console.log("error", error);
-        // })
+    do {
         
-
         const res = await alchemy.core.getAssetTransfers({
             "fromBlock":`${fromBlock}`, //String: starting block
             "toBlock": `${toBlock}`, //String: end block
@@ -98,44 +64,47 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             "category": tokenTypes, // Array of Strings: 
             "withMetadata": true, // Boolean: true or false
             "excludeZeroValue": false, // Boolean: true or false
-            "maxCount": "0x05"
+            // "maxCount": "0x01"
         });
 
-        const ans = await Promise.all(
-            res.transfers.map(async (transfer) => {
-                //get {Marketplace, Action, quantity, price} from 
+        console.log(res.transfers.length);
+        for (let i = 0; i<res.transfers.length; i++) {
+            const transfer = res.transfers[i];
+            //get {Marketplace, Action, quantity, price} from 
 
-                const marketInfo = await getDataFromTxnHash(transfer.hash, UTC2timestamp(transfer.metadata.blockTimestamp));   
-                //get NFTMetadata from tokenAddresss and its id.
-                const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
-                currentLastBlock = transfer.blockNum;
-                
-                const result = {
-                    TxnHash: transfer.hash,
-                    Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
-                    Dt: transfer.metadata.blockTimestamp,
-                    Action: marketInfo.action,
-                    Buyer: transfer.from,
-                    NFT: metadata.contract.name,
-                    TokenId: transfer.tokenId,
-                    TType: metadata.contract.tokenType,
-                    Quantity: marketInfo.quantity,
-                    Price: marketInfo.price,
-                    Market: marketInfo.marketplace
-                }
-                
-                return result;
-            })
-        )
-        
-        console.log(ans);
-    // } while(currentLastBlock < toBlock);
+            const marketInfo = await getDataFromTxnHash(transfer.hash, UTC2timestamp(transfer.metadata.blockTimestamp));   
+            if (!marketInfo) {
+                console.log(i);
+                continue;
+            }
+            //get NFTMetadata from tokenAddresss and its id.
+            const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
+
+            currentLastBlock = transfer.blockNum;
+            
+            const result = {
+                TxnHash: transfer.hash,
+                Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
+                Dt: transfer.metadata.blockTimestamp,
+                Action: marketInfo.action,
+                Buyer: transfer.from,
+                NFT: metadata.contract.name,
+                TokenId: hexToNumberString(transfer.tokenId),
+                TType: metadata.contract.tokenType,
+                Quantity: marketInfo.quantity,
+                Price: marketInfo.price,
+                Market: marketInfo.marketplace
+            }
+            
+        }        
+    } while(currentLastBlock < toBlock);
 
 }
 
 const tokenAddr = "0x50f5474724e0ee42d9a4e711ccfb275809fd6d4a";
 const tokenTypes = ["erc721"];
-const fromBlock =  "0x0";
+const fromBlock =  "0x8A2C86";
 const toBlock = "latest";
 
 getDataFromToken(tokenAddr, tokenTypes, fromBlock, toBlock);
+
