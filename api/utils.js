@@ -172,7 +172,7 @@ const parseDecodedData = async (marketPlace, decodedLog) => {
             currency = "WETH";
         }
         quantity = "1",
-            price = stringToEther(events[4].value);
+        price = stringToEther(events[4].value);
     } else if (marketplace === 'LooksRare') {
         if (marketPlace.signature === '0x68cd251d4d267c6e2034ff0088b990352b97b2002c0476587d0c4da889c11330') { //TakerAsk()
             action = Action.buy;

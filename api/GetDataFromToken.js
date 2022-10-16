@@ -13,12 +13,12 @@ const baseURL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
 
 /**
  * insert data of buffer (Queue) into database
- * @param {string} currency : "ETH", "WETH", "BTC",
+ * 
  */
-const parseAndWriteDB = async (currency) => {
+const parseAndWriteDB = async () => {
     // since the timestamps of items in buffer have the same value, pick out fist timestamp. 
     const timestamp = (buffer.peek()).Ts;
-
+    const currency = (buffer.peek()).Currency;
     // get token price to 
     const tokenPrice = await getCurrencyPrice(timestamp, currency, "USD");
     
@@ -45,7 +45,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * Since there are limits(<1000) of fetching size, you should iterate same procedure until the
      * current blockNumber gets bigger than 'toBlock'
      */
-    fromBlock = 9780595;
+    
     let currentLastBlock = fromBlock;
     let pastTxnHash;
     let firstRun = true;
@@ -92,7 +92,8 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 TType: metadata.contract.tokenType,
                 Quantity: marketInfo.quantity,
                 Price: marketInfo.price,
-                Market: marketInfo.marketplace
+                Market: marketInfo.marketplace,
+                Currency: marketInfo.currency
             }
             
             // streaming process for writing database
@@ -100,7 +101,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 buffer.enqueue(result);
                 if (firstRun) firstRun = false;
             } else {
-                await parseAndWriteDB(marketInfo.currency);
+                await parseAndWriteDB();
                 buffer.enqueue(result);
             }
             pastTxnHash = result.TxnHash;
