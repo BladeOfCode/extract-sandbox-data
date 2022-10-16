@@ -45,7 +45,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * Since there are limits(<1000) of fetching size, you should iterate same procedure until the
      * current blockNumber gets bigger than 'toBlock'
      */
-    fromBlock = 9780595;
+    
     let currentLastBlock = fromBlock;
     let pastTxnHash;
     let firstRun = true;
