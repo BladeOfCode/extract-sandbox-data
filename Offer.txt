@@ -1,0 +1,38 @@
+Upwork Job:
+
+///////Offer/////////////////
+Build a tool to extract data, fix issues and write docs.
+The developer will write a Python program to extract data about Sandbox Land token transactions as what is done here: https://etherscan.io/nfttracker?contractAddress=0x50f5474724e0ee42d9a4e711ccfb275809fd6d4a#trade (The above link only allows a user to download very limited data. Thus, we have a need to build a Python app ourself.) The app takes the start and end dates as the input. There should be no limit to the number of transactions that can be extracted. The data will be saved in CSV format as the following: TxnHash,Ts,Dt,Action,Buyer,NFT,TokenID,TType,Quantity,Price,Market 0xe5fda2e116d977fe80a2db2a74fa4c5f38c7ee88abb58536801143c092dceb53,1640997278,"2022-01-01 00:34:38",Bought,0x561d4c86576c9e1675f1f77318ecfc18ec85d9dc,"Sandbox's LANDs",53523,721,1,"3.94 ETH ($14,840.96)",OpenSea
+
+
+/////////{API_KEY}//////////////
+API Key: cdZMvFflTva0ndaMJf65KwT6gKps548o
+// Setup
+import { Network, Alchemy } from 'alchemy-sdk';
+
+const settings = {
+apiKey: "cdZMvFflTva0ndaMJf65KwT6gKps548o",
+network: Network.ETH\_MAINNET,
+};
+
+const alchemy = new Alchemy(settings);
+
+// Get the latest block
+const latestBlock = alchemy.core.getBlockNumber();
+
+// Get all outbound transfers for a provided address
+alchemy.core
+.getTokenBalances('0x994b342dd87fc825f66e51ffa3ef71ad818b6893')
+.then(console.log);
+
+// Get all the NFTs owned by an address
+const nfts = alchemy.nft.getNftsForOwner("0xshah.eth");
+
+// Listen to all new pending transactions
+alchemy.ws.on(
+{ method: "alchemy\_pendingTransactions",
+fromAddress: "0xshah.eth" },
+(res) => console.log(res)
+);
+https://eth-mainnet.g.alchemy.com/v2/cdZMvFflTva0ndaMJf65KwT6gKps548o
+wss://eth-mainnet.g.alchemy.com/v2/cdZMvFflTva0ndaMJf65KwT6gKps548o
