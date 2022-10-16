@@ -82,3 +82,8 @@ for example:
 D:\sort_input\extract-sandbox-data>node index.js "2019-01-01 00:00:00" "2020-02-10 00:00:00" "save.csv"
 ```
 You can see save.csv in the extract-sandbox-data folder.
+
+## Caution
+- You can only extract data to csv file after buidling database.
+- It will take some time out to build database.
+- There might be some minor errors with ETH price because I used free API key.
