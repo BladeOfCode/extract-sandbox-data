@@ -45,6 +45,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * Since there are limits(<1000) of fetching size, you should iterate same procedure until the
      * current blockNumber gets bigger than 'toBlock'
      */
+    fromBlock = 9780595;
     let currentLastBlock = fromBlock;
     let pastTxnHash;
     let firstRun = true;
@@ -60,7 +61,6 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             "category": tokenTypes, // Array of Strings: 
             "withMetadata": true, // Boolean: true or false
             "excludeZeroValue": false, // Boolean: true or false
-            // "maxCount": "0x01"
         });
 
         console.log(res.transfers.length);
@@ -106,7 +106,10 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             pastTxnHash = result.TxnHash;
             // await insertRow(Object.values(result));
         }
+        currentLastBlock++;
     } while(currentLastBlock < toBlock);
+
+    console.log("finished building databased");
 }
 
 // const tokenAddr = "0x50f5474724e0ee42d9a4e711ccfb275809fd6d4a";
