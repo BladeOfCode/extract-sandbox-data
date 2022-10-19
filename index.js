@@ -9,7 +9,7 @@ const {writeCSV} = require('./db/writeCSV');
  */
 const parseInputs = (input) => {
     const result = [...input];
-    console.log(result);
+    // console.log(result);
     if (!isValidTimeFormat(result[0]) || !isValidTimeFormat(result[1])) return [];
     return result;
 }

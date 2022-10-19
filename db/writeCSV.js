@@ -19,7 +19,8 @@ const columns = [
     "TokenID",
     "TType",
     "Quantity",
-    "Price",
+    "PriceInToken",
+    "PriceInUSD",
     "Market"
 ];
 
@@ -36,12 +37,12 @@ const writeCSV =  async (stDate, edDate, filename) => {
     
     const stTimeStamp = UTC2timestamp(new Date(stDate).toUTCString());
     const edTimeStamp = UTC2timestamp(new Date(edDate).toUTCString());
-    console.log(stTimeStamp, edTimeStamp);
+//    console.log(stTimeStamp, edTimeStamp);
 
     const selectionSQL = `select * from ${dbTableName} where Ts >= ${stTimeStamp} and Ts <= ${edTimeStamp}`;
     
     const stringifier = stringify({header: true, columns: columns});
-    console.log(selectionSQL);
+ //   console.log(selectionSQL);
     
     db.each(selectionSQL, (error, row) => {
         if (error) {
