@@ -96,6 +96,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 Currency: marketInfo.currency
             }
             
+            
             // streaming process for writing database
             if (pastTxnHash === result.TxnHash || firstRun) {
                 buffer.enqueue(result);
