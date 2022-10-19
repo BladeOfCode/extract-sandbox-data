@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="/">
-    <img src="images/sandbox.jfif" alt="Logo" width="200" height="100">
+    <img src="images/sandbox.jfif" alt="Logo" width="300" height="200">
   </a>
   <h3 align="center">Extract SandBox's Land transaction data deployed on Ethereum</h3>
 </div>
@@ -30,7 +30,7 @@
 ## About The Project
 
 This is a command line application that extracts blockchain transaction data with the given token address.
-Since the amount of transaction data is enormouse and scraping these data takes much time, I decided to write the code for building database.
+Since the amount of transaction data is enormouse and scraping these data takes much time, so I decided to write the code for building database in user's laptop.
 After building database, we can extract relevant data to csv file based on our database.
 
 This application is built with NodeJS, Alchemy APIs, and web.js and I used sqlite3 database for building database.
@@ -83,7 +83,11 @@ D:\sort_input\extract-sandbox-data>node index.js "2019-01-01 00:00:00" "2020-02-
 ```
 You can see save.csv in the extract-sandbox-data folder.
 
+## Scalability
+- We can utilize these basic APIs to operate backend server that listens specific events occuring in several blockchains not only Ethereum but also Binance or other blockchains by inserting a few codes.
+- We can integrate it to front end using several front end frameworks.
 ## Caution
 - You can only extract data to csv file after buidling database.
 - It will take some time out to build database.
-- There might be some minor errors with ETH price because I used free API key.
+- There might be some minor differences in USD price.
+

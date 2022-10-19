@@ -308,5 +308,6 @@ module.exports = {
     getCurrencyPrice,
     lastBlockNumberFromDB,
     latestBlockNumberWithToken,
-    alchemy
+    alchemy,
+    web3,
 }

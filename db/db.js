@@ -45,7 +45,8 @@ function createTable(db) {
         TokenID     TEXT,
         TType       TEXT,
         Quantity    TEXT,
-        Price       TEXT,
+        PriceInToken TEXT,
+        PriceInUSD  TEXT,
         Market      TEXT
     )
     `)
