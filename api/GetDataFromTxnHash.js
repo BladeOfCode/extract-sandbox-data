@@ -20,11 +20,20 @@ const web3 = new Web3(SDK_URL);
  * @param {uint} timestamp 
  * @returns {marketplace, action, buyer, price, quantity} information from transaction hash.
  */
+
+function sleep(miliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while(currentDate - date < miliseconds);
+}
+
 const getDataFromTxnHash = async (txnHash, timestamp) => {
     let result;
 
     // fetch transactions from txnHash
-
+//    sleep(500);
     const answer = await new Promise(async (resolve, reject) => {
         await web3.eth.getTransactionReceipt(txnHash, (error, receipt) => {
             if (error) {

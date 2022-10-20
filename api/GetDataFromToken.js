@@ -2,6 +2,7 @@
 const {getNFTMetadata, UTC2desiredTime, UTC2timestamp, alchemy, toHexString, hexToNumberString, getCurrencyPrice, changeRow} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
 const { insertRow , insertRows} = require('../db/insertData');
+const {debounce} = require('debounce');
 
 const axios = require('axios');
 const { Queue } = require('./Queue');
@@ -72,8 +73,8 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             currentLastBlock = transfer.blockNum;
 
             //get {marketplace, buyer, action, price, quantity} from transaction hash.
-            const marketInfo = await getDataFromTxnHash(transfer.hash, UTC2timestamp(transfer.metadata.blockTimestamp));   
-
+            
+            const marketInfo = await getDataFromTxnHash(transfer.hash, transfer.metadata.blockTimestamp);
             // unavailable data 
             if (!marketInfo) {
                 console.log(hexToNumberString(transfer.blockNum));
