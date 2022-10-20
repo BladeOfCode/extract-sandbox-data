@@ -28,7 +28,7 @@ const parseAndWriteDB = async () => {
         const priceToken = data.PriceInToken / bufferLen;
         const priceDollar = priceToken * tokenPrice;
         // data.Price = `${priceToken} ${currency} ($${priceDollar})`;
-        data.priceInToken = priceToken + " " + currency;
+        data.PriceInToken = priceToken + " " + currency;
         data.PriceInUSD = "$" + priceDollar;
         await insertRow(Object.values(data));
     }
@@ -94,12 +94,12 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 TType: metadata.contract.tokenType,
                 Quantity: marketInfo.quantity,
                 PriceInToken: marketInfo.price,
+                PriceInUSD:'',
                 Market: marketInfo.marketplace,
                 Currency: marketInfo.currency,
-                PriceInUSD:''
             }
 
-            console.log(result);
+            //console.log(result);
 
             // streaming process for writing database
             if (pastTxnHash === result.TxnHash || firstRun) {
