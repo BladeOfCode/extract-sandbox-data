@@ -111,8 +111,6 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 if (firstRun) firstRun = false;
             } else {
                 await parseAndWriteDB();
-
-                console.log("--->")
                 buffer.enqueue(result);
             }
             pastTxnHash = result.TxnHash;
