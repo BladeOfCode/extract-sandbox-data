@@ -217,6 +217,16 @@ const parseDecodedData = async (marketPlace, decodedLog) => {
         }
         quantity = '1';
         price = stringToEther(events[3].value);
+    } else if (marketPlace === '0x Protocol') {
+        if (events[0].value === '0') {
+            action = Action.buy;
+            currency = "ETH";
+        } else {
+            action = Action.bid;
+            currency = 'WETH';
+        }
+        quantity = '1';
+        price = stringToEther(events[5]);
     }
 
     return {
