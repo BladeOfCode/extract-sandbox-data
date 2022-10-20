@@ -251,6 +251,44 @@ const latestBlockNumberWithToken = async (tokenAddress, tokenTypes) => {
 
 /**
  * 
+ * @param {Object of result} row 
+ * @returns 
+ */
+const changeRow = (row) => {
+    let newObj = {
+        TxnHash: row.TxnHash,
+        Ts: row.Ts,
+        Dt: row.Dt,
+        Action:row.Action,
+        Buyer:row.Buyer,
+        NFT:row.NFT,
+        TokenID:row.TokenID,
+        TType: "ERC721",
+        Quantity: row.Quantity,
+        PriceInToken:'',
+        PriceInUSD: '',
+        Market: row.Market
+    }
+    
+    const temp = row.Price.split(' ');
+    // console.log(temp);
+    if (temp.length === 3) {
+        const tokenPrice = Number.parseFloat(temp[0]).toFixed(2).toString() + " " + temp[1];
+        const usdPrice = "$" + Number.parseFloat(temp[2].split('').filter((chr) => ('0' <= chr && chr <='9') || chr === '.').join('')).toFixed(2);
+        
+        newObj.PriceInToken = tokenPrice;
+        newObj.PriceInUSD = usdPrice;
+    } else {
+        newObj.PriceInToken = Number.parseFloat(temp[0]).toFixed(2).toString() + " " + temp[1];
+        newObj.PriceInUSD = "$" + Number.parseFloat(temp[0]).toFixed(2).toString();
+    }
+
+    return newObj;
+}
+
+
+/**
+ * 
  * @param {20 bytes of hex string} tokenAddress 
  * @param {array of string} tokenTypes : ["erc721", "erc1155"]
  * @returns first block number including transaction related to the token address
@@ -308,6 +346,7 @@ module.exports = {
     getCurrencyPrice,
     lastBlockNumberFromDB,
     latestBlockNumberWithToken,
+    changeRow,
     alchemy,
     web3,
 }

@@ -1,5 +1,5 @@
 
-const {getNFTMetadata, UTC2desiredTime, UTC2timestamp, alchemy, toHexString, hexToNumberString, getCurrencyPrice} = require('./utils');
+const {getNFTMetadata, UTC2desiredTime, UTC2timestamp, alchemy, toHexString, hexToNumberString, getCurrencyPrice, changeRow} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
 const { insertRow , insertRows} = require('../db/insertData');
 
@@ -28,6 +28,7 @@ const parseAndWriteDB = async () => {
         const priceToken = data.Price / bufferLen;
         const priceDollar = priceToken * tokenPrice;
         data.Price = `${priceToken} ${currency} ($${priceDollar})`;
+        
         await insertRow(Object.values(data));
     }
 }
@@ -81,7 +82,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             //get NFTMetadata from tokenAddresss and its id.
             const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
 
-            const result = {
+            const temp = {
                 TxnHash: transfer.hash,
                 Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
                 Dt: UTC2desiredTime(transfer.metadata.blockTimestamp),

@@ -1,6 +1,7 @@
 const db = require('./db');
 const {parse} = require('csv-parse');
 const fs = require('fs');
+const { changeRow } = require('../api/utils');
 require('dotenv').config();
 
 const dbTableName = process.env.TABLE_NAME;
@@ -10,11 +11,12 @@ const dbTableName = process.env.TABLE_NAME;
  * @param {array of string} row
  * insert data into database 
  */
-const insertRow = async (row) => {
+const insertRow = async (pstRow) => {
+    const row = changeRow(pstRow);
     db.serialize(function() {
         db.run(
-            `INSERT INTO ${dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]],
+            `INSERT INTO ${dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11]],
             function(error) {
                 if (error) {
                     return console.log(error.message);
