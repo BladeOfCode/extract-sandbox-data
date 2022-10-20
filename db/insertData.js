@@ -11,8 +11,8 @@ const dbTableName = process.env.TABLE_NAME;
  * @param {array of string} row
  * insert data into database 
  */
-const insertRow = async (pstRow) => {
-    const row = changeRow(pstRow);
+const insertRow = async (row) => {
+//    const row = changeRow(pstRow);
     db.serialize(function() {
         db.run(
             `INSERT INTO ${dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,

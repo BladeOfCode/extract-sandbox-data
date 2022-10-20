@@ -270,6 +270,7 @@ const changeRow = (row) => {
         Market: row.Market
     }
     
+    console.log(row.Price);
     const temp = row.Price.split(' ');
     // console.log(temp);
     if (temp.length === 3) {
