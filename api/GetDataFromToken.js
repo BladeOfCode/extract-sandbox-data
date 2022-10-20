@@ -1,5 +1,5 @@
 
-const {getNFTMetadata, UTC2desiredTime, UTC2timestamp, alchemy, toHexString, hexToNumberString, getCurrencyPrice, changeRow} = require('./utils');
+const {getNFTMetadata, UTC2desiredTime, UTC2timestamp, alchemy, toHexString, sleep, hexToNumberString, getCurrencyPrice, changeRow} = require('./utils');
 const {getDataFromTxnHash} = require('./GetDataFromTxnHash');
 const { insertRow , insertRows} = require('../db/insertData');
 const {debounce} = require('debounce');
@@ -21,6 +21,7 @@ const parseAndWriteDB = async () => {
     const timestamp = (buffer.peek()).Ts;
     const currency = (buffer.peek()).Currency;
     // get token price to 
+    //sleep(100);
     const tokenPrice = await getCurrencyPrice(timestamp, currency, "USD");
     
     const bufferLen = buffer.length;
@@ -31,6 +32,7 @@ const parseAndWriteDB = async () => {
         // data.Price = `${priceToken} ${currency} ($${priceDollar})`;
         data.PriceInToken = priceToken + " " + currency;
         data.PriceInUSD = "$" + priceDollar;
+        
         await insertRow(Object.values(data));
     }
 }
@@ -48,7 +50,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
      * Since there are limits(<1000) of fetching size, you should iterate same procedure until the
      * current blockNumber gets bigger than 'toBlock'
      */
-    fromBlock = 14097115;
+    
     let currentLastBlock = fromBlock;
     let pastTxnHash;
     let firstRun = true;
@@ -82,6 +84,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             }
             
             //get NFTMetadata from tokenAddresss and its id.
+            
             const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
 
             const result = {
@@ -108,6 +111,8 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
                 if (firstRun) firstRun = false;
             } else {
                 await parseAndWriteDB();
+
+                console.log("--->")
                 buffer.enqueue(result);
             }
             pastTxnHash = result.TxnHash;

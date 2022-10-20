@@ -24,6 +24,14 @@ const alchemy = new Alchemy(settings);
 const SDK_URL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
 const web3 = new Web3(SDK_URL);
 
+const sleep = (miliseconds) => {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while(currentDate - date < miliseconds);
+}
+
 /**
  * @param {string} dateString 
  * @returns if the dateString is the valid date return true, otherwise return false
@@ -358,6 +366,7 @@ module.exports = {
     lastBlockNumberFromDB,
     latestBlockNumberWithToken,
     changeRow,
+    sleep,
     alchemy,
     web3,
 }

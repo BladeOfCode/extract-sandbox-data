@@ -1,4 +1,4 @@
-const {determineMarketPlace, parseDecodedData, UTC2timestamp} = require('./utils');
+const {determineMarketPlace, parseDecodedData, sleep, UTC2timestamp} = require('./utils');
 
 const {Network, Alchemy} = require('alchemy-sdk');
 const Web3 = require('web3');
@@ -21,21 +21,15 @@ const web3 = new Web3(SDK_URL);
  * @returns {marketplace, action, buyer, price, quantity} information from transaction hash.
  */
 
-function sleep(miliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while(currentDate - date < miliseconds);
-}
 
 const getDataFromTxnHash = async (txnHash, timestamp) => {
     let result;
 
     // fetch transactions from txnHash
-//    sleep(500);
+    //sleep(100);
     const answer = await new Promise(async (resolve, reject) => {
-        await web3.eth.getTransactionReceipt(txnHash, (error, receipt) => {
+        //sleep(100);
+        await web3.eth.getTransactionReceipt(txnHash, async (error, receipt) => {
             if (error) {
                 console.log("Error:", error);
                 reject(error);
@@ -53,9 +47,9 @@ const getDataFromTxnHash = async (txnHash, timestamp) => {
                 } else {
                     abiDecoder.addABI(marketPlace.abi[0]);
                 }
-
+                
                 //decode logs to human readable data
-                const decodedLog = abiDecoder.decodeLogs(receipt.logs);
+                const decodedLog = await abiDecoder.decodeLogs(receipt.logs);
 
                 //parse decoded logs to available info (marketplace, action, buyer, price, quantity)
                 parseDecodedData(marketPlace, decodedLog)
