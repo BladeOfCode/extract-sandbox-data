@@ -8,7 +8,6 @@ const buildRun = async ()=> {
     const fromBlock = await lastBlockNumberFromDB();
     const toBlock = await latestBlockNumberWithToken(tokenAddr, tokenTypes);
     
-    fromBlock = 14097115;
     getDataFromToken(tokenAddr, tokenTypes, fromBlock, toBlock);
 }
 
