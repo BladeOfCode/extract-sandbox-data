@@ -82,7 +82,7 @@ const getDataFromToken = async (tokenAddress, tokenTypes, fromBlock, toBlock) =>
             //get NFTMetadata from tokenAddresss and its id.
             const metadata = await getNFTMetadata(tokenAddress, transfer.tokenId);
 
-            const temp = {
+            const result = {
                 TxnHash: transfer.hash,
                 Ts: UTC2timestamp(transfer.metadata.blockTimestamp),
                 Dt: UTC2desiredTime(transfer.metadata.blockTimestamp),
